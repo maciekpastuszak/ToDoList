@@ -33,29 +33,54 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
+const listSchema = {
+  name: String,
+  items: [itemsSchema]
+};
+
+const List = mongoose.model("List", listSchema);
 
 app.get("/", (req, res) => {
-
-
   Item.find({}, (err,foundItems) =>{
 
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err){
-  if (err){
-    console.log(err)
-  } else {
-    console.log("Added Successfully!")
-  }
-});
-res.redirect("/");
-} else {
-      res.render("list", {listTitle : "Today", newListItems: foundItems});
-}
-
+      if (err){
+        console.log(err)
+      } else {
+        console.log("Added Successfully!")
+      }
+    });
+    res.redirect("/");
+    } else {
+          res.render("list", {listTitle : "Today", newListItems: foundItems});
+    }
 
   })
-
   
+});
+
+app.get("/:customListName", (req,res) => {
+  const customListName = req.params.customListName;
+
+  List.findOne({name: customListName}, (err,foundList) => {
+    if (!err) {
+      if (!foundList){
+        //Create a new List
+        const list = new List({
+          name: customListName,
+          items: defaultItems
+        });
+        list.save();
+        res.redirect("/" + customListName)
+      } else {
+        //Show existing list
+        res.render("list", {listTitle : foundList.name, newListItems: foundList.items})
+      }
+    }
+  })
+
+  list.save();
 });
 
 app.post("/", (req, res) => {
