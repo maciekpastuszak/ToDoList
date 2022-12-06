@@ -34,10 +34,10 @@ const item3 = new Item({
 const defaultItems = [item1, item2, item3];
 
 
-app.get("/", function(req, res) {
+app.get("/", (req, res) => {
 
 
-  Item.find({}, function(err,foundItems){
+  Item.find({}, (err,foundItems) =>{
 
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err){
@@ -58,7 +58,7 @@ res.redirect("/");
   
 });
 
-app.post("/", function(req, res){
+app.post("/", (req, res) => {
 
   const itemName = req.body.newItem;
 
@@ -78,11 +78,21 @@ app.post("/", function(req, res){
   // }
 });
 
-app.get("/work", function(req,res){
+app.post("/delete", (req,res) => {
+  const checkedItemId = req.body.checkbox;
+  Item.findByIdAndRemove(checkedItemId, (err) => {
+  if (!err){
+    console.log("Successfully deleted item!");
+    res.redirect("/");
+  }
+  })
+})
+
+app.get("/work", (req,res) => {
   res.render("list", {listTitle: "Work List", newListItems: workItems});
 });
 
-app.get("/about", function(req, res){
+app.get("/about", (req, res) => {
   res.render("about");
 });
 
