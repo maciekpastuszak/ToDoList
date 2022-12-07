@@ -53,7 +53,7 @@ app.get("/", (req, res) => {
     });
     res.redirect("/");
     } else {
-          res.render("list", {listTitle : "Today", newListItems: foundItems});
+    res.render("list", {listTitle : "Today", newListItems: foundItems});
     }
 
   })
@@ -116,13 +116,18 @@ app.post("/", (req, res) => {
 
 app.post("/delete", (req,res) => {
   const checkedItemId = req.body.checkbox;
+  const listName = req.body.listName;
+  if (listName === "Today"){
   Item.findByIdAndRemove(checkedItemId, (err) => {
   if (!err){
     console.log("Successfully deleted item!");
     res.redirect("/");
   }
-  })
-})
+  });
+  } else {
+    List.findOneAndUpdate({name: listName}, {$pull: {items: {id: checkedItemId}}})
+  }
+  });
 
 app.get("/work", (req,res) => {
   res.render("list", {listTitle: "Work List", newListItems: workItems});
