@@ -86,14 +86,25 @@ app.get("/:customListName", (req,res) => {
 app.post("/", (req, res) => {
 
   const itemName = req.body.newItem;
+  const listName = req.body.list;
 
   const item = new Item({
     name: itemName
   });
 
-  item.save();
+  if (listName === "Today"){
+    item.save();
 
-  res.redirect("/")
+    res.redirect("/")
+  } else {
+    List.findOne({name: listName}, (err,foundList) => {
+      foundList.items.push(item);
+      foundList.save();
+      res.redirect("/" + listName);
+    })
+  }
+
+
   // if (req.body.list === "Work") {
   //   workItems.push(item);
   //   res.redirect("/work");
